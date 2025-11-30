@@ -1,8 +1,8 @@
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SURVEILLANCE GRID // V12 INFINITE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SURVEILLANCE GRID // V13 RESPONSIVE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
@@ -13,6 +13,7 @@
             --text-dim: #666;
             --border-color: #333;
             --accent-color: #ff2222; 
+            --bar-height: 60px; /* コントロールバーの高さ */
         }
 
         body {
@@ -21,23 +22,52 @@
             height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
+        /* --- モニターウォール（グリッドエリア） --- */
         #monitor-wall {
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-            width: 100%; height: calc(100% - 50px);
-            gap: 4px; background: #111; padding: 4px; box-sizing: border-box;
+            display: grid;
+            width: 100%;
+            height: calc(100% - var(--bar-height)); /* バーの分引く */
+            background: #111; 
+            padding: 4px; 
+            box-sizing: border-box;
+            gap: 4px;
+            
+            /* 【PC用デフォルト】 3x3 固定レイアウト */
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            overflow: hidden;
         }
 
+        /* --- 個別モニター --- */
         .monitor {
             position: relative; background: #000;
             border: 2px solid var(--border-color); overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            width: 100%; height: 100%;
+        }
+
+        /* スマホ対応（画面幅768px以下） */
+        @media (max-width: 768px) {
+            #monitor-wall {
+                /* 2列にして縦スクロールさせる */
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(5, 1fr); /* 9個なので5行分 */
+                overflow-y: auto; /* 縦スクロール有効 */
+                gap: 8px;
+                padding: 8px;
+            }
+            .monitor {
+                /* スマホではアスペクト比を維持して高さを確保 */
+                aspect-ratio: 16 / 9;
+                height: auto; 
+            }
         }
 
         /* 砂嵐 */
         .static-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.5; z-index: 0;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLLVAAABmElEQVR42u3YsQ2AMAwAwaj9d06HIwgJ0Fhiu8/X1bX9fQ4Afrn3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afj1A9bDO1376Q5FAAAAAElFTkSuQmCC');
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLLVAAABmElEQVR42u3YsQ2AMAwAwaj9d06HIwgJ0Fhiu8/X1bX9fQ4Afrn3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afj1A9bDO1376Q5FAAAAAElFTkSuQmCC');
             animation: static-anim 0.2s steps(4) infinite;
             filter: contrast(150%) brightness(0.8);
             transition: opacity 0.2s;
@@ -45,6 +75,7 @@
         .monitor.is-error .static-noise { opacity: 0.9 !important; filter: contrast(200%) brightness(1.2); }
         @keyframes static-anim { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
+        /* iframe制御 */
         .monitor iframe {
             width: 100%; height: 100%; border: none;
             transform: scale(1.4); pointer-events: none;
@@ -54,6 +85,7 @@
         }
         .monitor iframe.is-playing { opacity: 1; }
 
+        /* スキャンライン */
         .monitor::before {
             content: ""; display: block; position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -61,6 +93,7 @@
             z-index: 5; background-size: 100% 3px; pointer-events: none;
         }
 
+        /* オーバーレイUI */
         .overlay-top-left {
             position: absolute; top: 8px; left: 8px; z-index: 10;
             font-family: 'VT323', monospace; font-size: 14px;
@@ -78,7 +111,7 @@
             font-family: 'Share Tech Mono', monospace; font-size: 11px;
             color: var(--text-bright); text-transform: uppercase;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 70%; opacity: 0.8; text-shadow: 1px 1px 1px #000;
+            max-width: 60%; opacity: 0.8; text-shadow: 1px 1px 1px #000;
         }
         .monitor.is-error .video-title { color: var(--accent-color); animation: blink 0.5s infinite alternate; }
 
@@ -91,19 +124,49 @@
             box-shadow: 0 0 5px var(--accent-color);
         }
 
+        /* --- コントロールバー（レスポンシブ） --- */
         #control-bar {
-            height: 50px; background: #111; border-top: 2px solid var(--border-color);
-            display: flex; align-items: center; padding: 0 15px; gap: 15px; font-family: 'VT323', monospace;
+            height: var(--bar-height);
+            background: #111; 
+            border-top: 2px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            padding: 0 15px; 
+            gap: 10px; 
+            font-family: 'VT323', monospace;
+            z-index: 100;
+            white-space: nowrap;
+            overflow-x: auto; /* ボタンが多い時は横スクロール */
         }
         
         #playlist-input { display: none; } 
-        .playlist-label { font-size: 14px; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 2px 8px; opacity: 0.8; }
+        
+        .playlist-label { 
+            font-size: 14px; color: var(--accent-color); 
+            border: 1px solid var(--accent-color); padding: 4px 8px; opacity: 0.8; 
+            display: flex; align-items: center;
+        }
+
+        /* ボタンデザイン調整 */
         button {
             background: #222; color: var(--text-bright); border: 1px solid var(--border-color);
-            padding: 4px 12px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 16px;
+            padding: 8px 16px; /* スマホでもタップしやすいサイズ */
+            cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 16px;
+            transition: all 0.2s;
+            flex-shrink: 0; /* 縮まないように */
         }
-        button:hover { border-color: var(--accent-color); color: var(--accent-color); }
-        .system-status { font-size: 14px; color: var(--text-dim); margin-left: auto; text-align: right; }
+        button:hover { border-color: var(--accent-color); color: var(--accent-color); background: #333; }
+        button:active { transform: translateY(2px); }
+
+        .system-status { 
+            font-size: 14px; color: var(--text-dim); 
+            margin-left: auto; text-align: right; 
+            display: none; /* スマホでは狭いので一旦隠す */
+        }
+        /* PC画面ならステータス表示 */
+        @media (min-width: 769px) {
+            .system-status { display: block; }
+        }
 
         @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
     </style>
@@ -121,8 +184,8 @@ https://www.youtube.com/watch?v=LnrmP3Z1M-s,
 https://www.youtube.com/watch?v=VM18f-IIUTw
         </textarea>
         
-        <div class="playlist-label">MODE: FULL_SCATTER</div>
-        <button onclick="forceCycle()">SKIP ALL</button>
+        <div class="playlist-label">AUTO</div>
+        <button onclick="forceCycle()">SKIP</button>
         <button onclick="location.reload()">REBOOT</button>
         <div class="system-status" id="status-display">STANDBY</div>
     </div>
@@ -135,28 +198,22 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
 
         let players = [];
         const gridCount = 9;
-        
-        // 「全ての可能な映像ソース」を格納する巨大なプール
         let channelPool = [];
-        // 現在どの画面にどのソースIDを表示しているか管理（重複チェック用）
         let activeSources = new Array(gridCount).fill(null);
 
         function onYouTubeIframeAPIReady() {
             setTimeout(createGrid, 1000);
         }
 
-        // 入力から「仮想チャンネルプール」を生成する
         function buildChannelPool() {
             const raw = document.getElementById('playlist-input').value;
             const parts = raw.split(/[\n, ]+/);
-            
             channelPool = [];
             let playlistId = "";
 
             parts.forEach(part => {
                 const cleanPart = part.trim();
                 if(cleanPart.length < 5) return;
-
                 if (cleanPart.includes("list=") || cleanPart.startsWith("PL")) {
                     const match = cleanPart.match(/[?&]list=([^#\&\?]+)/);
                     if (match) playlistId = match[1];
@@ -167,39 +224,21 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
                     if (matchV) id = matchV[1];
                     else if (cleanPart.includes("youtu.be/")) id = cleanPart.split("youtu.be/")[1];
                     else id = cleanPart;
-                    
                     if(id) channelPool.push({ type: 'video', id: id, uid: `vid_${id}` });
                 }
             });
 
-            // プレイリストがあれば、それを「50個の個別チャンネル」としてプールに追加
-            // これが「1つずつ振り分ける」の正体や！
             if (playlistId) {
-                // プレイリストのIndex 0〜49をそれぞれ独立したソースとして登録
                 for (let i = 0; i < 50; i++) {
-                    channelPool.push({ 
-                        type: 'playlist_slice', 
-                        id: playlistId, 
-                        index: i,
-                        uid: `pl_${playlistId}_${i}` // ユニークID
-                    });
+                    channelPool.push({ type: 'playlist_slice', id: playlistId, index: i, uid: `pl_${playlistId}_${i}` });
                 }
             }
-
-            console.log(`Pool Created: ${channelPool.length} channels available.`);
         }
 
-        // プールから、現在使われていないランダムなソースを1つ選ぶ
         function pickRandomSource() {
-            // 現在表示中のUIDリスト
             const currentUIDs = activeSources.map(s => s ? s.uid : null);
-            
-            // まだ使われていない候補をフィルタリング
             const available = channelPool.filter(ch => !currentUIDs.includes(ch.uid));
-            
-            // もし候補がなければ（稀やけど）、プール全体から選ぶ
             const candidates = available.length > 0 ? available : channelPool;
-            
             return candidates[Math.floor(Math.random() * candidates.length)];
         }
 
@@ -210,9 +249,8 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             players = [];
 
             for (let i = 0; i < gridCount; i++) {
-                // 初期ソース決定
                 const source = pickRandomSource();
-                activeSources[i] = source; // 記録
+                activeSources[i] = source;
 
                 const camId = (i + 1).toString().padStart(2, '0');
                 const div = document.createElement('div');
@@ -237,7 +275,7 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
                     events: {
                         'onReady': (event) => { 
                             event.target.playVideo(); 
-                            startAutoSwitch(i); // 自動切り替え開始
+                            startAutoSwitch(i);
                         },
                         'onStateChange': (event) => onPlayerStateChange(event, i),
                         'onError': (event) => onPlayerError(event, i)
@@ -245,10 +283,9 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
                 };
 
                 if (source.type === 'playlist_slice') {
-                    // プレイリストの特定の位置を指定してロード
                     videoConfig.playerVars.listType = 'playlist';
                     videoConfig.playerVars.list = source.id;
-                    videoConfig.playerVars.index = source.index; // ここでバラバラの位置を指定
+                    videoConfig.playerVars.index = source.index;
                     videoConfig.playerVars.loop = 1;
                 } else {
                     videoConfig.videoId = source.id;
@@ -261,40 +298,26 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             updateSysStatus();
         }
 
-        // --- 個別自動ザッピング ---
         function startAutoSwitch(index) {
-            // 30秒〜90秒のランダムな間隔
             const delay = (Math.floor(Math.random() * 60) + 30) * 1000;
-            
             setTimeout(() => {
                 const monitor = document.getElementById(`monitor-${index}`);
-                // エラーでフリーズしている画面は切り替えない（静止画固定のため）
                 if (!monitor.classList.contains('is-error')) {
                     changeChannel(index);
                 }
-                // 次の予約
                 startAutoSwitch(index);
             }, delay);
         }
 
-        // 指定の画面のチャンネルを、重複しない新しいものに変更する
         function changeChannel(index) {
             const player = players[index];
             if (!player || typeof player.loadPlaylist !== 'function') return;
 
             const newSource = pickRandomSource();
-            activeSources[index] = newSource; // 情報を更新
+            activeSources[index] = newSource;
 
-            console.log(`CAM-${index}: Switching to ${newSource.uid}`);
-
-            // プレイヤーに新しいソースをロードさせる
             if (newSource.type === 'playlist_slice') {
-                player.loadPlaylist({
-                    list: newSource.id,
-                    listType: 'playlist',
-                    index: newSource.index,
-                    startSeconds: 0
-                });
+                player.loadPlaylist({ list: newSource.id, listType: 'playlist', index: newSource.index, startSeconds: 0 });
             } else {
                 player.loadVideoById(newSource.id);
             }
@@ -315,7 +338,6 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
                 let videoData = event.target.getVideoData();
                 titleLabel.innerText = (videoData && videoData.title) ? videoData.title : "SIGNAL LOCKED";
             } else if (event.data === YT.PlayerState.ENDED) {
-                // 終了したら次のチャンネルへ
                 changeChannel(index);
             }
         }
@@ -327,17 +349,13 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             const titleLabel = document.getElementById(`title-${index}`);
             
             iframe.classList.remove('is-playing');
-            monitor.classList.add('is-error'); // 砂嵐固定
-
+            monitor.classList.add('is-error');
             statusLabel.innerText = "[ERR]";
             statusLabel.style.color = "var(--accent-color)";
             titleLabel.innerText = "SIGNAL LOST / FROZEN";
-            
-            // ここでは自動復旧させない。ずっと砂嵐。
         }
 
         function forceCycle() {
-            // 手動スキップボタン：エラー以外の画面を全部入れ替える
             for(let i=0; i<gridCount; i++) {
                 const monitor = document.getElementById(`monitor-${i}`);
                 if (!monitor.classList.contains('is-error')) {
@@ -348,10 +366,16 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
 
         function updateSysStatus() {
             const now = new Date().toLocaleTimeString();
-            document.getElementById('status-display').innerHTML = 
-                `TIME: ${now} | POOL: ${channelPool.length} CH`;
+            document.getElementById('status-display').innerHTML = `TIME: ${now} | POOL: ${channelPool.length} CH`;
         }
         setInterval(updateSysStatus, 1000);
     </script>
 </body>
 </html>
+
+<style>
+  /* 最初の見出し（h1）を消す */
+  h1:first-of-type {
+    display: none !important;
+  }
+</style>
