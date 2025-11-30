@@ -2,38 +2,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SURVEILLANCE GRID // V14 FULLSCREEN</title>
+    <title>SURVEILLANCE GRID // V15 FULLSCREEN</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
         :root {
             --bg-main: #000;
             --accent-color: #ff2222; 
-            --bar-height: 50px; /* コントロールバーをさらに細く */
+            --bar-height: 50px; 
         }
 
-        body {
+        /* htmlとbodyを強制的に画面いっぱいに広げる */
+        html, body {
+            width: 100%; height: 100%; 
             margin: 0; padding: 0;
             background-color: var(--bg-main); color: #ddd;
             font-family: 'Share Tech Mono', monospace;
-            height: 100vh; width: 100vw;
-            overflow: hidden; display: flex; flex-direction: column;
+            overflow: hidden; /* スクロールバーを消す */
         }
 
-        /* --- モニターウォール（余白ゼロ） --- */
+        /* --- モニターウォール（絶対配置で画面を占拠） --- */
         #monitor-wall {
-            display: grid;
-            width: 100%;
-            /* バー以外の領域をフルに使う */
-            height: calc(100% - var(--bar-height)); 
-            background: #000; 
-            padding: 0; /* 余白削除 */
-            gap: 2px; /* 隙間も最小限に（境界線程度） */
-            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw; /* 画面の幅いっぱい */
+            height: calc(100vh - var(--bar-height)); /* 下のバー以外全部 */
             
-            /* PC: 3x3 */
+            background: #000; 
+            display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
+            gap: 2px; /* 境界線は極細に */
+            box-sizing: border-box;
+            z-index: 1;
         }
 
         /* 個別モニター */
@@ -41,12 +43,14 @@
             position: relative; background: #000;
             overflow: hidden;
             width: 100%; height: 100%;
-            /* 枠線も削除して映像だけで埋める（好みで border: 1px solid #222 くらい残してもええけど今回はナシで） */
         }
 
-        /* スマホ対応 */
+        /* スマホ対応（縦持ち） */
         @media (max-width: 768px) {
             #monitor-wall {
+                /* スマホなら縦スクロールさせる */
+                position: relative; 
+                height: calc(100% - var(--bar-height));
                 grid-template-columns: repeat(2, 1fr);
                 grid-template-rows: repeat(5, 1fr);
                 overflow-y: auto;
@@ -66,11 +70,12 @@
         .monitor.is-error .static-noise { opacity: 0.9 !important; filter: contrast(200%) brightness(1.2); }
         @keyframes static-anim { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
-        /* iframe制御：余黒が出ないように拡大率アップ */
+        /* iframe制御：黒帯が出ないように拡大率を少し上げる */
         .monitor iframe {
             width: 100%; height: 100%; border: none;
-            /* 1.5倍に拡大して黒帯を完全に押し出す */
-            transform: scale(1.5); 
+            /* 1.6倍に拡大して画面いっぱいに映像を押し込む */
+            transform: scale(1.6); 
+            transform-origin: center center;
             pointer-events: none;
             opacity: 0; transition: opacity 0.5s;
             position: relative; z-index: 2;
@@ -91,7 +96,7 @@
             position: absolute; top: 8px; left: 8px; z-index: 10;
             font-family: 'VT323', monospace; font-size: 14px;
             text-shadow: 1px 1px 2px #000; pointer-events: none;
-            background: rgba(0,0,0,0.5); padding: 2px 4px; /* 文字が見やすいように背景追加 */
+            background: rgba(0,0,0,0.5); padding: 2px 4px;
         }
         .overlay-bottom {
             position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10;
@@ -117,14 +122,19 @@
             box-shadow: 0 0 5px var(--accent-color);
         }
 
-        /* コントロールバー */
+        /* --- コントロールバー（絶対配置） --- */
         #control-bar {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; 
             height: var(--bar-height);
             background: #050505; 
             border-top: 1px solid #333;
             display: flex; align-items: center; padding: 0 10px; gap: 10px; 
-            font-family: 'VT323', monospace; z-index: 100;
+            font-family: 'VT323', monospace; 
+            z-index: 100;
             white-space: nowrap; overflow-x: auto;
+            box-sizing: border-box;
         }
         
         #playlist-input { display: none; } 
@@ -143,7 +153,7 @@
 
         @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
         
-        /* ユーザー要望：h1消去 */
+        /* リクエストのH1消去用CSS */
         h1:first-of-type { display: none !important; }
     </style>
 </head>
@@ -205,6 +215,7 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             });
 
             if (playlistId) {
+                // プレイリストを50個の仮想チャンネルに分割
                 for (let i = 0; i < 50; i++) {
                     channelPool.push({ type: 'playlist_slice', id: playlistId, index: i, uid: `pl_${playlistId}_${i}` });
                 }
