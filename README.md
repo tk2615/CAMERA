@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SURVEILLANCE GRID // V15 FULLSCREEN</title>
+    <title>SURVEILLANCE GRID // V16 GIF NOISE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
@@ -12,76 +12,76 @@
             --bar-height: 50px; 
         }
 
-        /* htmlとbodyを強制的に画面いっぱいに広げる */
         html, body {
             width: 100%; height: 100%; 
             margin: 0; padding: 0;
             background-color: var(--bg-main); color: #ddd;
             font-family: 'Share Tech Mono', monospace;
-            overflow: hidden; /* スクロールバーを消す */
+            overflow: hidden;
         }
 
-        /* --- モニターウォール（絶対配置で画面を占拠） --- */
         #monitor-wall {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw; /* 画面の幅いっぱい */
-            height: calc(100vh - var(--bar-height)); /* 下のバー以外全部 */
-            
+            position: absolute; top: 0; left: 0;
+            width: 100vw; height: calc(100vh - var(--bar-height));
             background: #000; 
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 2px; /* 境界線は極細に */
-            box-sizing: border-box;
-            z-index: 1;
+            gap: 2px; box-sizing: border-box; z-index: 1;
         }
 
-        /* 個別モニター */
         .monitor {
             position: relative; background: #000;
-            overflow: hidden;
-            width: 100%; height: 100%;
+            overflow: hidden; width: 100%; height: 100%;
         }
 
-        /* スマホ対応（縦持ち） */
         @media (max-width: 768px) {
             #monitor-wall {
-                /* スマホなら縦スクロールさせる */
                 position: relative; 
                 height: calc(100% - var(--bar-height));
                 grid-template-columns: repeat(2, 1fr);
                 grid-template-rows: repeat(5, 1fr);
-                overflow-y: auto;
-                gap: 2px;
+                overflow-y: auto; gap: 2px;
             }
         }
 
-        /* 砂嵐 */
+        /* --- 砂嵐（GIF画像に変更） --- */
         .static-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.5; z-index: 0;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLLVAAABmElEQVR42u3YsQ2AMAwAwaj9d06HIwgJ0Fhiu8/X1bX9fQ4Afrn3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afi1x/fF9wH4tcf3xfcB+LXH98X3Afj1A9bDO1376Q5FAAAAAElFTkSuQmCC');
-            animation: static-anim 0.2s steps(4) infinite;
-            filter: contrast(150%) brightness(0.8);
+            z-index: 0;
+            
+            /* ここで noise.gif を読み込むで！ */
+            background-image: url('noise.gif');
+            
+            /* 画面いっぱいに引き伸ばす */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            /* 普段（ロード中など）は少し暗めにしておく */
+            opacity: 0.6; 
             transition: opacity 0.2s;
+            
+            /* GIF自体が動くからCSSアニメーションは削除したで */
         }
-        .monitor.is-error .static-noise { opacity: 0.9 !important; filter: contrast(200%) brightness(1.2); }
-        @keyframes static-anim { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
-        /* iframe制御：黒帯が出ないように拡大率を少し上げる */
+        /* エラー時は不透明度を上げて、GIFをくっきり見せる */
+        .monitor.is-error .static-noise { 
+            opacity: 1 !important; 
+            filter: contrast(1.2) brightness(1.1); /* 少し激しく見せる補正 */
+        }
+
+        /* iframe制御 */
         .monitor iframe {
             width: 100%; height: 100%; border: none;
-            /* 1.6倍に拡大して画面いっぱいに映像を押し込む */
-            transform: scale(1.6); 
-            transform-origin: center center;
+            transform: scale(1.6); transform-origin: center center;
             pointer-events: none;
-            opacity: 0; transition: opacity 0.5s;
+            opacity: 0; /* ロード中は透明（後ろのGIFが見える） */
+            transition: opacity 0.5s;
             position: relative; z-index: 2;
             filter: contrast(1.1) sepia(0.1) saturate(1.2);
         }
-        .monitor iframe.is-playing { opacity: 1; }
+        .monitor iframe.is-playing { opacity: 1; /* 再生されたら表示（GIFを隠す） */ }
 
         /* スキャンライン */
         .monitor::before {
@@ -122,26 +122,16 @@
             box-shadow: 0 0 5px var(--accent-color);
         }
 
-        /* --- コントロールバー（絶対配置） --- */
         #control-bar {
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; 
-            height: var(--bar-height);
-            background: #050505; 
-            border-top: 1px solid #333;
+            position: absolute; bottom: 0; left: 0; width: 100%; height: var(--bar-height);
+            background: #050505; border-top: 1px solid #333;
             display: flex; align-items: center; padding: 0 10px; gap: 10px; 
-            font-family: 'VT323', monospace; 
-            z-index: 100;
-            white-space: nowrap; overflow-x: auto;
-            box-sizing: border-box;
+            font-family: 'VT323', monospace; z-index: 100;
+            white-space: nowrap; overflow-x: auto; box-sizing: border-box;
         }
         
         #playlist-input { display: none; } 
-        .playlist-label { 
-            font-size: 14px; color: var(--accent-color); 
-            border: 1px solid var(--accent-color); padding: 2px 6px; 
-        }
+        .playlist-label { font-size: 14px; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 2px 6px; }
 
         button {
             background: #222; color: #ddd; border: 1px solid #444;
@@ -153,7 +143,6 @@
 
         @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
         
-        /* リクエストのH1消去用CSS */
         h1:first-of-type { display: none !important; }
     </style>
 </head>
@@ -170,7 +159,7 @@ https://www.youtube.com/watch?v=LnrmP3Z1M-s,
 https://www.youtube.com/watch?v=VM18f-IIUTw
         </textarea>
         
-        <div class="playlist-label">FULLSCREEN_MODE</div>
+        <div class="playlist-label">GIF_NOISE_ACTIVE</div>
         <button onclick="forceCycle()">SKIP</button>
         <button onclick="location.reload()">REBOOT</button>
         <div class="system-status" id="status-display">STANDBY</div>
@@ -215,7 +204,6 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             });
 
             if (playlistId) {
-                // プレイリストを50個の仮想チャンネルに分割
                 for (let i = 0; i < 50; i++) {
                     channelPool.push({ type: 'playlist_slice', id: playlistId, index: i, uid: `pl_${playlistId}_${i}` });
                 }
