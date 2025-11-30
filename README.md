@@ -2,64 +2,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SURVEILLANCE GRID // V13 RESPONSIVE</title>
+    <title>SURVEILLANCE GRID // V14 FULLSCREEN</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
         :root {
-            --bg-main: #080808;
-            --bg-monitor: #000;
-            --text-bright: #ddd;
-            --text-dim: #666;
-            --border-color: #333;
+            --bg-main: #000;
             --accent-color: #ff2222; 
-            --bar-height: 60px; /* コントロールバーの高さ */
+            --bar-height: 50px; /* コントロールバーをさらに細く */
         }
 
         body {
-            margin: 0; background-color: var(--bg-main); color: var(--text-bright);
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: #ddd;
             font-family: 'Share Tech Mono', monospace;
-            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            height: 100vh; width: 100vw;
+            overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* --- モニターウォール（グリッドエリア） --- */
+        /* --- モニターウォール（余白ゼロ） --- */
         #monitor-wall {
             display: grid;
             width: 100%;
-            height: calc(100% - var(--bar-height)); /* バーの分引く */
-            background: #111; 
-            padding: 4px; 
+            /* バー以外の領域をフルに使う */
+            height: calc(100% - var(--bar-height)); 
+            background: #000; 
+            padding: 0; /* 余白削除 */
+            gap: 2px; /* 隙間も最小限に（境界線程度） */
             box-sizing: border-box;
-            gap: 4px;
             
-            /* 【PC用デフォルト】 3x3 固定レイアウト */
+            /* PC: 3x3 */
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            overflow: hidden;
         }
 
-        /* --- 個別モニター --- */
+        /* 個別モニター */
         .monitor {
             position: relative; background: #000;
-            border: 2px solid var(--border-color); overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            overflow: hidden;
             width: 100%; height: 100%;
+            /* 枠線も削除して映像だけで埋める（好みで border: 1px solid #222 くらい残してもええけど今回はナシで） */
         }
 
-        /* スマホ対応（画面幅768px以下） */
+        /* スマホ対応 */
         @media (max-width: 768px) {
             #monitor-wall {
-                /* 2列にして縦スクロールさせる */
                 grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(5, 1fr); /* 9個なので5行分 */
-                overflow-y: auto; /* 縦スクロール有効 */
-                gap: 8px;
-                padding: 8px;
-            }
-            .monitor {
-                /* スマホではアスペクト比を維持して高さを確保 */
-                aspect-ratio: 16 / 9;
-                height: auto; 
+                grid-template-rows: repeat(5, 1fr);
+                overflow-y: auto;
+                gap: 2px;
             }
         }
 
@@ -75,10 +66,12 @@
         .monitor.is-error .static-noise { opacity: 0.9 !important; filter: contrast(200%) brightness(1.2); }
         @keyframes static-anim { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
-        /* iframe制御 */
+        /* iframe制御：余黒が出ないように拡大率アップ */
         .monitor iframe {
             width: 100%; height: 100%; border: none;
-            transform: scale(1.4); pointer-events: none;
+            /* 1.5倍に拡大して黒帯を完全に押し出す */
+            transform: scale(1.5); 
+            pointer-events: none;
             opacity: 0; transition: opacity 0.5s;
             position: relative; z-index: 2;
             filter: contrast(1.1) sepia(0.1) saturate(1.2);
@@ -89,15 +82,16 @@
         .monitor::before {
             content: ""; display: block; position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0,0,0,0.2) 50%);
-            z-index: 5; background-size: 100% 3px; pointer-events: none;
+            background: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.3) 50%);
+            z-index: 5; background-size: 100% 4px; pointer-events: none;
         }
 
-        /* オーバーレイUI */
+        /* UIパーツ */
         .overlay-top-left {
             position: absolute; top: 8px; left: 8px; z-index: 10;
             font-family: 'VT323', monospace; font-size: 14px;
-            text-shadow: 1px 1px 2px #000; pointer-events: none; line-height: 1.2;
+            text-shadow: 1px 1px 2px #000; pointer-events: none;
+            background: rgba(0,0,0,0.5); padding: 2px 4px; /* 文字が見やすいように背景追加 */
         }
         .overlay-bottom {
             position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10;
@@ -106,17 +100,16 @@
             display: flex; justify-content: space-between; align-items: flex-end;
             pointer-events: none;
         }
-
         .video-title {
             font-family: 'Share Tech Mono', monospace; font-size: 11px;
-            color: var(--text-bright); text-transform: uppercase;
+            color: #ddd; text-transform: uppercase;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 60%; opacity: 0.8; text-shadow: 1px 1px 1px #000;
+            max-width: 60%; opacity: 0.9; text-shadow: 1px 1px 1px #000;
         }
         .monitor.is-error .video-title { color: var(--accent-color); animation: blink 0.5s infinite alternate; }
 
         .status-badge { font-family: 'VT323', monospace; font-size: 16px; text-shadow: 1px 1px 2px #000; }
-        .rec-indicator { color: var(--accent-color); font-weight: bold; text-shadow: 0 0 5px rgba(255,0,0,0.5); }
+        .rec-indicator { color: var(--accent-color); font-weight: bold; }
         .rec-dot {
             display: inline-block; width: 8px; height: 8px; 
             background: var(--accent-color); border-radius: 50%; 
@@ -124,51 +117,34 @@
             box-shadow: 0 0 5px var(--accent-color);
         }
 
-        /* --- コントロールバー（レスポンシブ） --- */
+        /* コントロールバー */
         #control-bar {
             height: var(--bar-height);
-            background: #111; 
-            border-top: 2px solid var(--border-color);
-            display: flex; 
-            align-items: center; 
-            padding: 0 15px; 
-            gap: 10px; 
-            font-family: 'VT323', monospace;
-            z-index: 100;
-            white-space: nowrap;
-            overflow-x: auto; /* ボタンが多い時は横スクロール */
+            background: #050505; 
+            border-top: 1px solid #333;
+            display: flex; align-items: center; padding: 0 10px; gap: 10px; 
+            font-family: 'VT323', monospace; z-index: 100;
+            white-space: nowrap; overflow-x: auto;
         }
         
         #playlist-input { display: none; } 
-        
         .playlist-label { 
             font-size: 14px; color: var(--accent-color); 
-            border: 1px solid var(--accent-color); padding: 4px 8px; opacity: 0.8; 
-            display: flex; align-items: center;
+            border: 1px solid var(--accent-color); padding: 2px 6px; 
         }
 
-        /* ボタンデザイン調整 */
         button {
-            background: #222; color: var(--text-bright); border: 1px solid var(--border-color);
-            padding: 8px 16px; /* スマホでもタップしやすいサイズ */
-            cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 16px;
-            transition: all 0.2s;
-            flex-shrink: 0; /* 縮まないように */
+            background: #222; color: #ddd; border: 1px solid #444;
+            padding: 4px 12px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 16px;
         }
         button:hover { border-color: var(--accent-color); color: var(--accent-color); background: #333; }
-        button:active { transform: translateY(2px); }
-
-        .system-status { 
-            font-size: 14px; color: var(--text-dim); 
-            margin-left: auto; text-align: right; 
-            display: none; /* スマホでは狭いので一旦隠す */
-        }
-        /* PC画面ならステータス表示 */
-        @media (min-width: 769px) {
-            .system-status { display: block; }
-        }
+        .system-status { font-size: 14px; color: #666; margin-left: auto; text-align: right; display: none; }
+        @media (min-width: 769px) { .system-status { display: block; } }
 
         @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
+        
+        /* ユーザー要望：h1消去 */
+        h1:first-of-type { display: none !important; }
     </style>
 </head>
 <body>
@@ -184,7 +160,7 @@ https://www.youtube.com/watch?v=LnrmP3Z1M-s,
 https://www.youtube.com/watch?v=VM18f-IIUTw
         </textarea>
         
-        <div class="playlist-label">AUTO</div>
+        <div class="playlist-label">FULLSCREEN_MODE</div>
         <button onclick="forceCycle()">SKIP</button>
         <button onclick="location.reload()">REBOOT</button>
         <div class="system-status" id="status-display">STANDBY</div>
@@ -352,7 +328,7 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             monitor.classList.add('is-error');
             statusLabel.innerText = "[ERR]";
             statusLabel.style.color = "var(--accent-color)";
-            titleLabel.innerText = "SIGNAL LOST / FROZEN";
+            titleLabel.innerText = "SIGNAL LOST";
         }
 
         function forceCycle() {
@@ -372,10 +348,3 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
     </script>
 </body>
 </html>
-
-<style>
-  /* 最初の見出し（h1）を消す */
-  h1:first-of-type {
-    display: none !important;
-  }
-</style>
