@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SURVEILLANCE GRID // V16 GIF NOISE</title>
+    <title>SURVEILLANCE GRID // V17 TRANSITION NOISE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
@@ -45,45 +45,30 @@
             }
         }
 
-        /* --- 砂嵐（GIF画像に変更） --- */
+        /* --- 砂嵐 (noise.gif) --- */
         .static-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0;
-            
-            /* ここで noise.gif を読み込むで！ */
             background-image: url('noise.gif');
-            
-            /* 画面いっぱいに引き伸ばす */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            
-            /* 普段（ロード中など）は少し暗めにしておく */
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             opacity: 0.6; 
-            transition: opacity 0.2s;
-            
-            /* GIF自体が動くからCSSアニメーションは削除したで */
+            transition: opacity 0.1s; /* 切り替わりを少しキビキビさせる */
         }
-
-        /* エラー時は不透明度を上げて、GIFをくっきり見せる */
-        .monitor.is-error .static-noise { 
-            opacity: 1 !important; 
-            filter: contrast(1.2) brightness(1.1); /* 少し激しく見せる補正 */
-        }
+        .monitor.is-error .static-noise { opacity: 1 !important; filter: contrast(1.2) brightness(1.1); }
 
         /* iframe制御 */
         .monitor iframe {
             width: 100%; height: 100%; border: none;
             transform: scale(1.6); transform-origin: center center;
             pointer-events: none;
-            opacity: 0; /* ロード中は透明（後ろのGIFが見える） */
-            transition: opacity 0.5s;
+            opacity: 0; /* デフォルトは透明（GIFが見える） */
+            transition: opacity 0.5s ease-in; /* 映像が出る時はフワッと */
             position: relative; z-index: 2;
             filter: contrast(1.1) sepia(0.1) saturate(1.2);
         }
-        .monitor iframe.is-playing { opacity: 1; /* 再生されたら表示（GIFを隠す） */ }
+        /* クラスがついている時だけ表示 */
+        .monitor iframe.is-playing { opacity: 1; }
 
-        /* スキャンライン */
         .monitor::before {
             content: ""; display: block; position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -159,7 +144,7 @@ https://www.youtube.com/watch?v=LnrmP3Z1M-s,
 https://www.youtube.com/watch?v=VM18f-IIUTw
         </textarea>
         
-        <div class="playlist-label">GIF_NOISE_ACTIVE</div>
+        <div class="playlist-label">NOISE_LINK: ON</div>
         <button onclick="forceCycle()">SKIP</button>
         <button onclick="location.reload()">REBOOT</button>
         <div class="system-status" id="status-display">STANDBY</div>
@@ -286,11 +271,23 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
 
         function changeChannel(index) {
             const player = players[index];
+            const iframe = document.getElementById(`player-${index}`);
+            const statusLabel = document.getElementById(`status-${index}`);
+            const titleLabel = document.getElementById(`title-${index}`);
+
             if (!player || typeof player.loadPlaylist !== 'function') return;
 
+            // 1. まず現在の映像を消す（これで後ろのGIFが見える）
+            iframe.classList.remove('is-playing');
+            statusLabel.innerText = "[TUNE]"; // チューニング中
+            statusLabel.style.color = "";
+            titleLabel.innerText = "SCANNING...";
+
+            // 2. 新しいソースを選ぶ
             const newSource = pickRandomSource();
             activeSources[index] = newSource;
 
+            // 3. プレイヤーにロード命令（ロードには1〜2秒かかるので、その間GIFが見え続ける）
             if (newSource.type === 'playlist_slice') {
                 player.loadPlaylist({ list: newSource.id, listType: 'playlist', index: newSource.index, startSeconds: 0 });
             } else {
@@ -305,6 +302,7 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             const titleLabel = document.getElementById(`title-${index}`);
             
             if (event.data === YT.PlayerState.PLAYING) {
+                // 再生開始：エラー状態解除＆映像表示（GIFを隠す）
                 monitor.classList.remove('is-error'); 
                 iframe.classList.add('is-playing');
                 statusLabel.innerText = "[LIVE]";
@@ -323,8 +321,8 @@ https://www.youtube.com/watch?v=VM18f-IIUTw
             const statusLabel = document.getElementById(`status-${index}`);
             const titleLabel = document.getElementById(`title-${index}`);
             
-            iframe.classList.remove('is-playing');
-            monitor.classList.add('is-error');
+            iframe.classList.remove('is-playing'); // 映像消去（GIF表示）
+            monitor.classList.add('is-error');     // エラー強調
             statusLabel.innerText = "[ERR]";
             statusLabel.style.color = "var(--accent-color)";
             titleLabel.innerText = "SIGNAL LOST";
